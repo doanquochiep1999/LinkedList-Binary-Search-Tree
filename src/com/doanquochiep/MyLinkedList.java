@@ -1,12 +1,14 @@
 package com.doanquochiep;
 
-public class MyLinkedList {
+public class MyLinkedList implements NodeList{
     private Node root = null;
 
+    @Override
     public Node getRoot() {
         return this.root;
     }
 
+    @Override
     public boolean addNode(Node newNode) {
         if (root == null) {
             root = newNode;
@@ -44,6 +46,7 @@ public class MyLinkedList {
         return false;
     }
 
+    @Override
     public boolean removeNode(Node node) {
         Node currentNode = this.root;
         System.out.println("Deleting node " + node.getValue());
@@ -73,6 +76,7 @@ public class MyLinkedList {
         return false;
     }
 
+    @Override
     public void traverse(Node root) {
         if (root == null) {
             System.out.println("The list is empty");
