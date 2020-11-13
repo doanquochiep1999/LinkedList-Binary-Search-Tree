@@ -78,91 +78,76 @@ public class SearchTree implements NodeList {
     }
 
     private void performRemoval(Node currentNode, Node parentNode) {
-        //parent has right child
-        if (parentNode.next() == currentNode) {
-            //current node has no children
-            if (currentNode.next() == null && currentNode.previous() == null) {
+        //case 1: deletion node has no subtrees
+        if (currentNode.previous() == null && currentNode.next() == null) {
+            //Special case: deletion node is the root node
+            //If the root has no subtrees, removing that will result in an EMPTY tree
+            if (currentNode == this.root) {
+                this.root = null;
+                return;
+            }
+            //if currentNode is right child of parentNode
+            if (parentNode.next() == currentNode) {
                 parentNode.setNext(null);
-                //current node only has right child
-            } else if (currentNode.next() != null && currentNode.previous() == null) {
-                parentNode.setNext(currentNode.next());
-                //current node only has left child
-            } else if (currentNode.previous() != null && currentNode.next() == null) {
-                parentNode.setNext(currentNode.previous());
-                //current node has two children
             } else {
-                Node currentLeftmostNode = currentNode.next();
-                Node leftmostParentNode = currentNode;
-                //find the smallest node in the subright tree
-                //moving to left if possible
-                while (currentLeftmostNode.previous() != null) {
-                    leftmostParentNode = currentLeftmostNode;
-                    currentLeftmostNode = currentLeftmostNode.previous();
-                }
-                //replace the value in currentNode (node to be deleted) with that in currentLeftmostNode
-                currentNode.setValue(currentLeftmostNode.getValue());
-                //remove currentLeftmostNode
-                if (leftmostParentNode.next() == currentLeftmostNode) {
-                    leftmostParentNode.setNext(currentLeftmostNode.next());
-                } else {
-                    leftmostParentNode.setPrevious(currentLeftmostNode.next());
-                }
-            }
-            //parent has left child
-        } else if (parentNode.previous() == currentNode) {
-            //current node has no children
-            if (currentNode.next() == null && currentNode.previous() == null) {
                 parentNode.setPrevious(null);
-                //current node only has right child
-            } else if (currentNode.next() != null && currentNode.previous() == null) {
-                parentNode.setPrevious(currentNode.next());
-                //current node only has left child
-            } else if (currentNode.previous() != null && currentNode.next() == null) {
-                parentNode.setPrevious(currentNode.previous());
-                //current node has two children
-            } else {
-                Node currentLeftmostNode = currentNode.next();
-                Node leftmostParentNode = currentNode;
-                //find the smallest node in the subright tree
-                //moving to left if possible
-                while (currentLeftmostNode.previous() != null) {
-                    leftmostParentNode = currentLeftmostNode;
-                    currentLeftmostNode = currentLeftmostNode.previous();
-                }
-                //replace the value in currentNode (node to be deleted) with that in currentLeftmostNode
-                currentNode.setValue(currentLeftmostNode.getValue());
-                //remove currentLeftmostNode
-                if (leftmostParentNode.next() == currentLeftmostNode) {
-                    leftmostParentNode.setNext(currentLeftmostNode.next());
-                } else {
-                    leftmostParentNode.setPrevious(currentLeftmostNode.next());
-                }
             }
-            //we are removing the root node
-        } else {
-            if (currentNode.next() == null) {
-                this.root = currentNode.previous();
-            } else {
-                Node currentLeftmostNode = currentNode.next();
-
-                Node leftmostParentNode = currentNode;
-                //find the smallest node in the subright tree
-                //moving to left if possible
-                while (currentLeftmostNode!=null && currentLeftmostNode.previous() != null) {
-                    leftmostParentNode = currentLeftmostNode;
-                    currentLeftmostNode = currentLeftmostNode.previous();
-                }
-                //replace the value in currentNode (node to be deleted) with that in currentLeftmostNode
-                currentNode.setValue(currentLeftmostNode.getValue());
-                //remove currentLeftmostNode
-                if (leftmostParentNode.next() == currentLeftmostNode) {
-                    leftmostParentNode.setNext(currentLeftmostNode.next());
-                } else {
-                    leftmostParentNode.setPrevious(currentLeftmostNode.next());
-                }
-            }
+            return;
         }
 
+        //case 2: deletion node has one subtree
+        //if deletion node has right subtree only
+        if (currentNode.previous() == null) {
+            //special case: if currentNode is the root
+            if (currentNode == this.root) {
+                this.root = currentNode.next();
+                return;
+            }
+            //if parentNode has right currentNode
+            if (parentNode.next() == currentNode) {
+                parentNode.setNext(currentNode.next());
+                return;
+            }
+            parentNode.setPrevious(currentNode.next());
+            return;
+        }
+        //if deletion node has left subtree only
+        if (currentNode.next() == null) {
+            //special case: if currentNode is the root
+            if (currentNode == this.root) {
+                this.root = currentNode.previous();
+                return;
+            }
+            //if parentNode has right currentNode
+            if (parentNode.next() == currentNode) {
+                parentNode.setNext(currentNode.previous());
+                return;
+            }
+            parentNode.setPrevious(currentNode.previous());
+            return;
+        }
+        //case 3: if deletion node has two subtrees
+        //find the minimum node in the subright tree
+        Node currentLeftmostNode = currentNode.next();
+        Node leftmostParentNode = currentNode;
+        //right subtree has no left subtree
+        if (currentLeftmostNode.previous() == null) {
+            //leftmostParentNode will be mimimum node
+            //replace the currentNode's value with leftmostParentNode's value
+            currentNode.setValue(currentLeftmostNode.getValue());
+            //remove currentLeftmostNode
+            currentNode.setNext(currentLeftmostNode.next());
+            return;
+        }
+        while(currentLeftmostNode.previous() != null) {
+            leftmostParentNode = currentLeftmostNode;
+            currentLeftmostNode = currentLeftmostNode.previous();
+        }
+        //leftmostParentNode will be mimimum node
+        //replace the currentNode's value with leftmostParentNode's value
+        currentNode.setValue(currentLeftmostNode.getValue());
+        //remove currentLeftmostNode
+        leftmostParentNode.setPrevious(currentLeftmostNode.next());
     }
 
 
